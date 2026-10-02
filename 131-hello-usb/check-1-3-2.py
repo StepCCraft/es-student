@@ -15,7 +15,6 @@ PROJECT = "131-hello-usb"
 LOG_NAME = "device-1-3-2.log"
 DURATION_S = 10
 
-
 def find_board():
     for port in list_ports.comports():
         if port.vid == VENDOR_ID and port.pid == PRODUCT_ID:
