@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/regs/addressmap.h"
@@ -22,6 +23,7 @@ int main()
 {
     // инициализируем пин светодиода
     // настраиваем пин светодиода на выход
+    stdio_init_all();
     gpio_init(LED_PIN);
     gpio_init(BUTTON_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
