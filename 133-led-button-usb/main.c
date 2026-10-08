@@ -38,7 +38,7 @@ int main()
         if (previous == true && current == false)
         {
             led = !led;
-            gpio_put(LED_PIN, led);
+            set_led(LED_PIN);
         }
 
         previous = current;
