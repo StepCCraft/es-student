@@ -1,7 +1,7 @@
 #include "led.h"
 #include "hardware/gpio.h"
 
-const uint LED_PIN = 25;
+#define LED_PIN 25
 
 static bool led_state = false;
 
@@ -27,10 +27,3 @@ bool led_is_on(void)
 {
     return led_state;
 }
-add_executable(${PROJECT_NAME}
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/led/led.c
-)
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/led
-)
