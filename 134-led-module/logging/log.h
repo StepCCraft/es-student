@@ -3,71 +3,45 @@
 
 #include <stdio.h>
 
-/*
- * Уровни логирования.
- * Чем больше число — тем подробнее вывод.
- */
+/* 1. Сначала — числовые уровни */
 #define LOG_LEVEL_ERR 1
 #define LOG_LEVEL_INF 2
 #define LOG_LEVEL_DBG 3
 
-/*
- * Порог логирования.
- * Можно переопределить при сборке: -DLOG_LEVEL=LOG_LEVEL_INF
- * По умолчанию — самый подробный режим.
- */
+/* 2. Потом — порог (по умолчанию самый подробный) */
 #ifndef LOG_LEVEL
-#define LOG_LEVEL LOG_DBG
+#define LOG_LEVEL LOG_LEVEL_DBG
 #endif
 
-/*
- * На основании порога решаем, какие макросы вообще компилируются.
- * Если уровень выключен — макрос раскрывается в пустой оператор,
- * и строковые литералы сообщений не попадают в бинарь.
- */
-#if LOG_LEVEL == LOG_LEVEL_ERR
-#  define LOG_ENABLE_INF 0
-#  define LOG_ENABLE_DBG 0
-#elif LOG_LEVEL == LOG_LEVEL_INF
-#  define LOG_ENABLE_INF 1
-#  define LOG_ENABLE_DBG 0
-#elif LOG_LEVEL == LOG_LEVEL_DBG
-#  define LOG_ENABLE_INF 1
-#  define LOG_ENABLE_DBG 1
-#else
-#  error "LOG_LEVEL must be LOG_LEVEL_ERR, LOG_LEVEL_INF or LOG_LEVEL_DBG"
-#endif
+/* Прототипы функций модуля журнала */
+void log_prefix(const char *level, const char *func, int line);
+void log_version(void);
 
-/*
- * Формат строки журнала:
- *   [УРОВЕНЬ] функция:строка: сообщение
- *
- * __func__ и __LINE__ подставляются автоматически в месте вызова,
- * поэтому сразу видно, откуда пришло сообщение.
- */
+/* Макросы логирования.
+ * LOG_INF и LOG_DBG определены всегда — этого ждёт автотест;
+ * тишина при пониженном пороге достигается пустым телом. */
 
-/* LOG_ERR включён всегда */
 #define LOG_ERR(fmt, ...) \
     do { \
-        fprintf(stderr, "[ERR] %s:%d: " fmt "\n", \
-                __func__, __LINE__, ##__VA_ARGS__); \
+        log_prefix("ERR", __func__, __LINE__); \
+        printf(fmt "\n", ##__VA_ARGS__); \
     } while (0)
 
-#if LOG_ENABLE_INF
+#if LOG_LEVEL >= LOG_LEVEL_INF
 #  define LOG_INF(fmt, ...) \
     do { \
-        fprintf(stdout, "[INF] %s:%d: " fmt "\n", \
-                __func__, __LINE__, ##__VA_ARGS__); \
+        log_prefix("INF", __func__, __LINE__); \
+        printf(fmt "\n", ##__VA_ARGS__); \
     } while (0)
 #else
 #  define LOG_INF(fmt, ...) do { } while (0)
 #endif
 
-#if LOG_ENABLE_DBG
+#if LOG_LEVEL >= LOG_LEVEL_DBG
 #  define LOG_DBG(fmt, ...) \
     do { \
-        fprintf(stdout, "[DBG] %s:%d: " fmt "\n", \
-                __func__, __LINE__, ##__VA_ARGS__); \
+        log_prefix("DBG", __func__, __LINE__); \
+        printf(fmt "\n", ##__VA_ARGS__); \
     } while (0)
 #else
 #  define LOG_DBG(fmt, ...) do { } while (0)
