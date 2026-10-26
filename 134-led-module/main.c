@@ -1,20 +1,29 @@
-// заголовочные файлы: добавился led.h, константы LED_PIN больше нет
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/gpio.h"   // добавлено: gpio_init, gpio_set_dir, gpio_get, gpio_pull_up
 #include "led.h"
 
 const uint BUTTON_PIN = 15;
 const uint DEBOUNCE_MS = 20;
 
-bool get_button_debounce(uint pin)
+// Возвращает true, если кнопка стабильно нажата (pin == 0 при pull-up)
+static bool get_button_debounce(uint pin)
 {
-    // читаем вывод устойчиво к дребезгу
-    bool state = gpio_get(pin);
+    bool first = gpio_get(pin);
     sleep_ms(DEBOUNCE_MS);
-    return state && gpio_get(pin);
+    bool second = gpio_get(pin);
+
+    // состояние считаем валидным только если оба чтения совпали
+    if (first != second)
+    {
+        return false; // дребезг — считаем, что нажатия не было
+    }
+
+    // при pull-up нажатие = 0, поэтому инвертируем
+    return !second;
 }
 
-void handle_command(int command)
+static void handle_command(int command)
 {
     if (command == 'e')
     {
@@ -32,35 +41,30 @@ void handle_command(int command)
     }
 }
 
-int main()
+int main(void)
 {
-    // включаем стандартный ввод-вывод
     stdio_init_all();
 
     led_init();
 
-    // инициализируем и настраиваем вывод кнопки
     gpio_init(BUTTON_PIN);
     gpio_set_dir(BUTTON_PIN, GPIO_IN);
     gpio_pull_up(BUTTON_PIN);
 
-    // объявляем переменные
-    bool previous = true;
-    bool current  = true;
+    bool previous_pressed = false;
 
-    while (1)
+    while (true)
     {
-        // читаем состояние пина кнопки с задержкой
-        current = get_button_debounce(BUTTON_PIN);
+        bool current_pressed = get_button_debounce(BUTTON_PIN);
 
-        if (previous == true && current == false)
+        // фронт: было не нажато -> стало нажато
+        if (!previous_pressed && current_pressed)
         {
             led_toggle();
             printf("led %s\n", led_is_on() ? "on" : "off");
         }
 
-        // запоминаем текущее состояние пина кнопки, как предыдущее
-        previous = current;
+        previous_pressed = current_pressed;
 
         int command = getchar_timeout_us(0);
 

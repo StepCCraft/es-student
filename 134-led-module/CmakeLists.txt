@@ -5,6 +5,7 @@ set(PICO_PLATFORM rp2040)
 
 include(pico_sdk_import.cmake)
 
+# Pico SDK требует CXX даже если вы пишете на C
 project(134_led_module C CXX ASM)
 
 pico_sdk_init()
@@ -22,6 +23,7 @@ target_link_libraries(${PROJECT_NAME}
     pico_stdlib
 )
 
+# Подключаем кастомный линкер-скрипт
 pico_set_linker_script(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/memmap_rp2040.ld
 )
