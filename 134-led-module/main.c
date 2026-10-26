@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
-#include "hardware/gpio.h"   // добавлено: gpio_init, gpio_set_dir, gpio_get, gpio_pull_up
+#include "hardware/gpio.h"   // gpio_init, gpio_set_dir, gpio_get, gpio_pull_up
 #include "led.h"
+#include "logging/log.h"
 
 const uint BUTTON_PIN = 15;
 const uint DEBOUNCE_MS = 20;
@@ -28,16 +29,20 @@ static void handle_command(int command)
     if (command == 'e')
     {
         led_set(true);
-        printf("led %s\n", led_is_on() ? "on" : "off");
+        LOG_INF("led %s", led_is_on() ? "on" : "off");
     }
     else if (command == 'd')
     {
         led_set(false);
-        printf("led %s\n", led_is_on() ? "on" : "off");
+        LOG_INF("led %s", led_is_on() ? "on" : "off");
+    }
+    else if (command == 'v')
+    {
+        log_version();
     }
     else
     {
-        printf("unknown command: %c\n", command);
+        LOG_ERR("unknown command: %c", command);
     }
 }
 
@@ -61,7 +66,7 @@ int main(void)
         if (!previous_pressed && current_pressed)
         {
             led_toggle();
-            printf("led %s\n", led_is_on() ? "on" : "off");
+            LOG_INF("led %s", led_is_on() ? "on" : "off");
         }
 
         previous_pressed = current_pressed;
@@ -73,6 +78,7 @@ int main(void)
             continue;
         }
 
+        LOG_DBG("got %c", command);
         handle_command(command);
     }
 }
