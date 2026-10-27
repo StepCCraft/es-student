@@ -1,7 +1,9 @@
 #include "led.h"
-#include "hardware/gpio.h"
+#include "pico/stdlib.h"
 
-#define LED_PIN 25
+#ifndef LED_PIN
+#  define LED_PIN 25   /* встроенный светодиод на Pico */
+#endif
 
 static bool led_state = false;
 
@@ -9,13 +11,14 @@ void led_init(void)
 {
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
-    led_set(false);
+    gpio_put(LED_PIN, 0);
+    led_state = false;
 }
 
 void led_set(bool on)
 {
     led_state = on;
-    gpio_put(LED_PIN, led_state);
+    gpio_put(LED_PIN, on ? 1 : 0);
 }
 
 void led_toggle(void)

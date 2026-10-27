@@ -2,21 +2,26 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "led.h"
-#include "log.h"          /* буквально "log.h" — этого ждёт автотест */
+#include "log.h"
+#include "device.h"
 
 const uint BUTTON_PIN = 15;
 const uint DEBOUNCE_MS = 20;
 
+/* Возвращает true, если кнопка стабильно нажата (pin == 0 при pull-up) */
 static bool get_button_debounce(uint pin)
 {
     bool first = gpio_get(pin);
     sleep_ms(DEBOUNCE_MS);
     bool second = gpio_get(pin);
 
+    /* состояние валидно, только если оба чтения совпали */
     if (first != second)
     {
         return false;
     }
+
+    /* при pull-up нажатие = 0, поэтому инвертируем */
     return !second;
 }
 
@@ -35,6 +40,10 @@ static void handle_command(int command)
     else if (command == 'v')
     {
         log_version();
+    }
+    else if (command == 'i')
+    {
+        device_info();
     }
     else
     {
@@ -58,6 +67,7 @@ int main(void)
     {
         bool current_pressed = get_button_debounce(BUTTON_PIN);
 
+        /* фронт: было не нажато -> стало нажато */
         if (!previous_pressed && current_pressed)
         {
             led_toggle();
