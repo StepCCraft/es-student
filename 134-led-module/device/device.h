@@ -8,10 +8,10 @@
 #define DEVICE_PROJECT    "134-led-module"
 #define DEVICE_REPO       "https://github.com/sezha/es-student"
 
-/* Тип платы: приходит из CMake как -DPICO_BOARD="pico".
- * Запасное значение — на случай сборки без определения компилятора. */
-#ifndef PICO_BOARD
-#  define PICO_BOARD      "unknown"
+/* Тип платы: приходит из CMake как -DDEVICE_BOARD="pico".
+ * Защищаем значением по умолчанию — на случай сборки без определения. */
+#ifndef DEVICE_BOARD
+#  define DEVICE_BOARD    "unknown"
 #endif
 
 /* Паспорт устройства: пять строк «ключ: значение» */
