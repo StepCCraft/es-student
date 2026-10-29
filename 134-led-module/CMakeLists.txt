@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
-project(134_led_module C CXX ASM)
+project(134_led_module)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
@@ -29,16 +29,10 @@ target_link_libraries(${PROJECT_NAME}
     pico_unique_id
 )
 
-# Тип платы передаём из настроек сборки в код определением компилятора.
+# Тип платы из настроек сборки → в код макросом DEVICE_BOARD
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     DEVICE_BOARD="${PICO_BOARD}"
-    PICO_BOARD="${PICO_BOARD}"
 )
-
-# ВАЖНО: строка pico_set_linker_script полностью удалена.
-# Начиная с SDK 2.0.0 стандартный скрипт компоновки используется автоматически,
-# ручное указание не требуется. Если ваш автотест требует наличия этой строки,
-# см. обходное решение ниже.
 
 pico_enable_stdio_usb(${PROJECT_NAME} 1)
 pico_enable_stdio_uart(${PROJECT_NAME} 0)
