@@ -1,19 +1,15 @@
 #include "log.h"
+#include "device.h"     /* имя и версия переехали в паспорт */
 
-#ifndef APP_NAME
-#  define APP_NAME "es-led-module"
-#endif
-#ifndef APP_VERSION
-#  define APP_VERSION "1.0.0"
-#endif
-
+/* Префикс строки журнала: "[УРОВЕНЬ] функция:строка: " */
 void log_prefix(const char *level, const char *func, int line)
 {
     printf("[%s] %s:%d: ", level, func, line);
 }
 
+/* Строка о прошивке. Печатает сам модуль журнала, без подписи уровня. */
 void log_version(void)
 {
     printf("device: %s %s, built %s %s, log level %d\n",
-           APP_NAME, APP_VERSION, __DATE__, __TIME__, LOG_LEVEL);
+           DEVICE_NAME, FIRMWARE_VERSION, __DATE__, __TIME__, LOG_LEVEL);
 }
